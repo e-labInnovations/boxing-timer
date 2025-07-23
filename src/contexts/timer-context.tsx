@@ -311,7 +311,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   );
   const { playSound } = useSounds();
   const { vibrate } = useVibration();
-  const { announce } = useVoiceAnnouncements();
+  const { announceAfterSound } = useVoiceAnnouncements();
 
   useEffect(() => {
     if (storedTemplates.length > 0) {
@@ -360,7 +360,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
           vibrate([200, 100, 200]);
         }
         if (state.config.enableVoiceAnnouncements) {
-          announce(currentStage?.title || "");
+          announceAfterSound(currentStage?.title || "");
         }
         dispatch({ type: "SET_START_SOUND_PLAYED", payload: true });
       }
@@ -408,7 +408,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
     state.config,
     playSound,
     vibrate,
-    announce,
+    announceAfterSound,
   ]);
 
   return (

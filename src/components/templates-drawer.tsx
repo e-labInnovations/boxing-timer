@@ -1,11 +1,11 @@
 import { Trash2, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import {
   useTimer,
   type Stage,
@@ -47,13 +47,13 @@ export function TemplatesDrawer() {
   };
 
   return (
-    <Sheet open={state.isTemplatesOpen} onOpenChange={handleClose}>
-      <SheetContent side="bottom" className="h-[70vh] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Saved Templates</SheetTitle>
-        </SheetHeader>
+    <Drawer open={state.isTemplatesOpen} onOpenChange={handleClose}>
+      <DrawerContent className="h-[70vh]">
+        <DrawerHeader>
+          <DrawerTitle>Saved Templates</DrawerTitle>
+        </DrawerHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="px-4 space-y-4 py-4 overflow-y-auto">
           {state.templates.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p>No templates saved yet.</p>
@@ -101,7 +101,7 @@ export function TemplatesDrawer() {
             ))
           )}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }

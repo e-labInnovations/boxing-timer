@@ -22,19 +22,22 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+} from "@/components/ui/drawer";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { TimePicker } from "@/components/time-picker";
+import { CounterInput } from "@/components/ui/counter-input";
+import { SoundPicker } from "@/components/ui/sound-picker";
 import { useTimer } from "@/contexts/timer-context";
-import { useSounds } from "@/hooks/use-sounds";
+
 import { generateId } from "@/lib/utils";
 import type { Stage, TimerConfig } from "@/contexts/timer-context";
 import {
@@ -73,7 +76,6 @@ function CompactStageItem({
   canMoveUp: boolean;
   canMoveDown: boolean;
 }) {
-  const { availableSounds } = useSounds();
   const [isOpen, setIsOpen] = useState(false);
   const {
     attributes,
@@ -179,47 +181,23 @@ function CompactStageItem({
               />
 
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor={`start-sound-${stage.id}`}>Start Sound</Label>
-                  <Select
-                    value={stage.startSoundId}
-                    onValueChange={(value) =>
-                      onUpdate({ ...stage, startSoundId: value })
-                    }
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableSounds.map((sound) => (
-                        <SelectItem key={sound.id} value={sound.id}>
-                          {sound.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <SoundPicker
+                  label="Start Sound"
+                  value={stage.startSoundId}
+                  onValueChange={(value) =>
+                    onUpdate({ ...stage, startSoundId: value })
+                  }
+                  id={`start-sound-${stage.id}`}
+                />
 
-                <div>
-                  <Label htmlFor={`end-sound-${stage.id}`}>End Sound</Label>
-                  <Select
-                    value={stage.endSoundId}
-                    onValueChange={(value) =>
-                      onUpdate({ ...stage, endSoundId: value })
-                    }
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableSounds.map((sound) => (
-                        <SelectItem key={sound.id} value={sound.id}>
-                          {sound.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <SoundPicker
+                  label="End Sound"
+                  value={stage.endSoundId}
+                  onValueChange={(value) =>
+                    onUpdate({ ...stage, endSoundId: value })
+                  }
+                  id={`end-sound-${stage.id}`}
+                />
               </div>
             </div>
           </CollapsibleContent>
@@ -231,7 +209,6 @@ function CompactStageItem({
 
 export function ConfigDrawer() {
   const { state, dispatch } = useTimer();
-  const { availableSounds } = useSounds();
   const [localConfig, setLocalConfig] = useState<TimerConfig>({
     ...state.config,
     endOfRoundSoundId: state.config.endOfRoundSoundId || undefined,
@@ -342,18 +319,18 @@ export function ConfigDrawer() {
     }
   };
 
-  const handleExportTemplate = () => {
-    const templateData = {
-      name: templateName || "Exported Template",
-      config: localConfig,
-      exportedAt: Date.now(),
-    };
-    const jsonString = JSON.stringify(templateData, null, 2);
-    navigator.clipboard.writeText(jsonString).then(() => {
-      // Could add a toast notification here
-      console.log("Template copied to clipboard");
-    });
-  };
+  // const handleExportTemplate = () => {
+  //   const templateData = {
+  //     name: templateName || "Exported Template",
+  //     config: localConfig,
+  //     exportedAt: Date.now(),
+  //   };
+  //   const jsonString = JSON.stringify(templateData, null, 2);
+  //   navigator.clipboard.writeText(jsonString).then(() => {
+  //     // Could add a toast notification here
+  //     console.log("Template copied to clipboard");
+  //   });
+  // };
 
   const accentColors = [
     { id: "blue", name: "Blue", class: "text-blue-500" },
@@ -365,13 +342,13 @@ export function ConfigDrawer() {
   ];
 
   return (
-    <Sheet open={state.isConfigOpen} onOpenChange={handleClose}>
-      <SheetContent side="bottom" className="h-[90vh] overflow-y-auto">
-        <SheetHeader className="pb-4">
-          <SheetTitle>Timer Configuration</SheetTitle>
-        </SheetHeader>
+    <Drawer open={state.isConfigOpen} onOpenChange={handleClose}>
+      <DrawerContent className="h-[90vh]">
+        <DrawerHeader className="pb-4">
+          <DrawerTitle>Timer Configuration</DrawerTitle>
+        </DrawerHeader>
 
-        <div className="space-y-4">
+        <div className="px-4 space-y-4 overflow-y-auto">
           {/* Rounds Configuration */}
           <div className="space-y-3 p-3 border rounded-lg bg-card">
             <h3 className="font-semibold">Rounds</h3>
@@ -387,25 +364,20 @@ export function ConfigDrawer() {
             </div>
 
             {!localConfig.isInfinite && (
-              <div>
-                <Label htmlFor="rounds">Total Rounds</Label>
-                <Input
-                  id="rounds"
-                  type="number"
-                  min="1"
-                  value={localConfig.totalRounds}
-                  onChange={(e) =>
-                    setLocalConfig({
-                      ...localConfig,
-                      totalRounds: Math.max(
-                        1,
-                        Number.parseInt(e.target.value) || 1
-                      ),
-                    })
-                  }
-                  className="mt-1"
-                />
-              </div>
+              <CounterInput
+                id="rounds"
+                label="Total Rounds"
+                value={localConfig.totalRounds}
+                onChange={(value) =>
+                  setLocalConfig({
+                    ...localConfig,
+                    totalRounds: value,
+                  })
+                }
+                min={1}
+                max={50}
+                presets={[1, 3, 5, 8, 10, 12, 15, 20]}
+              />
             )}
           </div>
 
@@ -443,6 +415,14 @@ export function ConfigDrawer() {
                     />
                   ))}
                 </div>
+                <Button
+                  variant="ghost"
+                  className="w-full"
+                  onClick={handleAddStage}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Stage
+                </Button>
               </SortableContext>
             </DndContext>
           </div>
@@ -451,30 +431,19 @@ export function ConfigDrawer() {
           <div className="space-y-3 p-3 border rounded-lg bg-card">
             <h3 className="font-semibold">Audio & Feedback</h3>
 
-            <div>
-              <Label htmlFor="end-sound">End of Round Sound</Label>
-              <Select
-                value={localConfig.endOfRoundSoundId || "none"}
-                onValueChange={(value) =>
-                  setLocalConfig({
-                    ...localConfig,
-                    endOfRoundSoundId: value === "none" ? undefined : value,
-                  })
-                }
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Select sound (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  {availableSounds.map((sound) => (
-                    <SelectItem key={sound.id} value={sound.id}>
-                      {sound.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <SoundPicker
+              label="End of Round Sound"
+              value={localConfig.endOfRoundSoundId || "none"}
+              onValueChange={(value) =>
+                setLocalConfig({
+                  ...localConfig,
+                  endOfRoundSoundId: value === "none" ? undefined : value,
+                })
+              }
+              id="end-sound"
+              placeholder="Select sound (optional)"
+              includeNone={true}
+            />
 
             <div className="flex items-center justify-between">
               <Label htmlFor="vibration">Vibration Alerts</Label>
@@ -531,7 +500,7 @@ export function ConfigDrawer() {
               />
             </div>
 
-            <div>
+            <div className="flex items-center justify-between">
               <Label htmlFor="accent-color">Accent Color</Label>
               <Select
                 value={localConfig.accentColor}
@@ -578,30 +547,27 @@ export function ConfigDrawer() {
                 Save
               </Button>
             </div>
-            <Button
+            {/* <Button
               onClick={handleExportTemplate}
               variant="outline"
               className="w-full bg-transparent"
             >
               Export Template (Copy JSON)
-            </Button>
+            </Button> */}
           </div>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-2 sticky bottom-0 bg-background">
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              className="flex-1 bg-transparent"
-            >
+        <DrawerFooter className="pt-4">
+          <div className="flex gap-3 w-full">
+            <Button variant="outline" onClick={handleClose} className="flex-1">
               Cancel
             </Button>
             <Button onClick={handleSave} className="flex-1">
               Apply Configuration
             </Button>
           </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

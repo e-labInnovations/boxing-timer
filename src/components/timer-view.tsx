@@ -194,7 +194,7 @@ export function TimerView() {
             <CircularProgress
               progress={progress}
               size={280}
-              strokeWidth={8}
+              strokeWidth={10}
               className="drop-shadow-lg"
               enableColorTransition={state.config.enableColorTransition}
               timeRemaining={state.timeRemaining}
@@ -203,7 +203,7 @@ export function TimerView() {
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
-                <div className="text-4xl md:text-6xl font-mono font-bold text-foreground">
+                <div className="text-6xl md:text-6xl font-mono font-bold text-foreground">
                   {formatTime(state.timeRemaining)}
                 </div>
                 {isTimerComplete && (
